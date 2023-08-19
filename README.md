@@ -41,6 +41,7 @@ The following routes are available in the API:
 - GET /login - Provide user name and password to loginto the system (Store the access token to varify).
 - POST /paletters - Create paletters. (Requires the access token to varify)
 - GET /paletters - Get all color paletters.
+- GET /paletters{paletter_id} - Get color paletters searching on Color or/and Name.
 - POST /paletters/{paletter_id}/favorite - Add favorite. (Requires the access token to varify)
 
 Please refer to the source code and documentation for more details on the API routes and request/response formats.
