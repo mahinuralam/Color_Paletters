@@ -43,14 +43,13 @@ def root():
     return "Welcome"
 
 
-# Example endpoint: User registration
 @app.post("/register", tags=["User"])
-async def register(user: User, db: Session = Depends(get_session)):
+def register(user: User, db: Session = Depends(get_session)):
     db_user = db.query(UserDB).filter(UserDB.username == user.username).first()
     if db_user:
         raise HTTPException(status_code=400, detail="Username already registered")
     
-    hashed_password = pwd_context.hash(user.password)  # Hash the password
+    hashed_password = pwd_context.hash(user.password)
     db_user = UserDB(username=user.username, email=user.email, hashed_password=hashed_password)
     signJWT(user.email)
     db.add(db_user)
@@ -59,7 +58,6 @@ async def register(user: User, db: Session = Depends(get_session)):
     return {"message": "User registered successfully"}
 
 
-# Example endpoint: User login
 @app.post("/login", tags=["User"])
 async def login(username: str, password: str, db: Session = Depends(get_session)):
     db_user = db.query(UserDB).filter(UserDB.username == username).first()
@@ -74,12 +72,13 @@ async def login(username: str, password: str, db: Session = Depends(get_session)
 
 
 @app.post("/palettes", dependencies=[Depends(JWTBearer())], response_model=PaletteResponse, tags=["Palettes"])
-async def create_palette(palette: PaletteCreate):
+def create_palette(palette: PaletteCreate):
     db = SessionLocal()
     db_palette = Palette(
         name=palette.name,
         dominant_colors=palette.dominant_colors,
-        accent_colors=palette.accent_colors,
+        accent_colors1=palette.accent_colors1,
+        accent_colors2=palette.accent_colors2,
         is_public=palette.is_public,
     )
     db.add(db_palette)
@@ -91,7 +90,7 @@ async def create_palette(palette: PaletteCreate):
 
 
 @app.get("/palettes", response_model=List[PaletteResponse], tags=["Palettes"])
-async def get_public_palettes():
+def get_public_palettes():
     db = SessionLocal()
     palettes = db.query(Palette).filter(Palette.is_public == 1).all()
     db.close()
@@ -105,7 +104,7 @@ async def get_public_palettes():
 
 
 @app.get("/palettes/search", response_model=List[PaletteResponse], tags=["Palettes"])
-async def search_palettes(
+def search_palettes(
     search_query: str = Query(None, title="Search query"),
     color_query: str = Query(None, title="Color query"),
 ):
@@ -122,7 +121,8 @@ async def search_palettes(
         query = query.filter(
             or_(
                 Palette.dominant_colors.ilike(f"%{color_query}%"),
-                Palette.accent_colors.ilike(f"%{color_query}%"),
+                Palette.accent_colors1.ilike(f"%{color_query}%"),
+                Palette.accent_colors2.ilike(f"%{color_query}%"),
             )
         )
     
@@ -137,26 +137,24 @@ async def search_palettes(
     return palette_responses
 
 
-async def get_current_user_email(token: str = Depends(reuseable_oauth)) -> User:
+#Get current user information from Token
+def get_current_user(token: str = Depends(reuseable_oauth)) -> User:
     try:
-        print("ONE --------------------------------------", token)
         payload = decodeJWT(token)
-        print("USER ID ->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ", payload.user_id)
         if payload is None:
             raise HTTPException(status_code=401, detail="Invalid or expired token")
-        return payload.user_id
+        return payload.get("user_id")
     except Exception as e:
         raise HTTPException(status_code=401, detail="Invalid token")
 
 
 @app.post("/palettes/{palette_id}/favorite", dependencies=[Depends(JWTBearer())], response_model=PaletteResponse, tags=["Palettes"])
-async def favorite_palette(palette_id: int, db: Session = Depends(get_session), current_user_email: str = Depends(get_current_user_email)):
-    print("DASDASD -> ", current_user_email)
+def favorite_palette(palette_id: int, db: Session = Depends(get_session), current_user: str = Depends(get_current_user)):
     palette = db.query(Palette).filter(Palette.id == palette_id).first()
     if not palette:
         raise HTTPException(status_code=404, detail="Palette not found")
     
-    user_db = db.query(UserDB).filter(UserDB.email == current_user_email).first()
+    user_db = db.query(UserDB).filter(UserDB.email == current_user).first()
     if not user_db:
         raise HTTPException(status_code=404, detail="User not found")
     

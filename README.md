@@ -1,4 +1,6 @@
-# Color_Paletters
+# Color_Palettes
+
+This is a Color Palettes creating project. Create using FastApi. For authentication JWT and OAuth2 is being used here.
 
 ## Installation
 
@@ -37,8 +39,8 @@ The following routes are available in the API:
 
 - POST /register - Provide user credentials to register.
 - GET /login - Provide user name and password to loginto the system (Store the access token to varify).
-- GET /paletters - Get all color paletters.
 - POST /paletters - Create paletters. (Requires the access token to varify)
+- GET /paletters - Get all color paletters.
 - POST /paletters/{paletter_id}/favorite - Add favorite. (Requires the access token to varify)
 
 Please refer to the source code and documentation for more details on the API routes and request/response formats.
