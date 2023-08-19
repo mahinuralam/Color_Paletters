@@ -4,10 +4,11 @@ from typing import Dict
 
 import jwt
 
-JWT_SECRET = "use your secret code with secrets.token_hex(10)"""
+JWT_SECRET = "use your secret code with secrets.token_hex(10)"
 JWT_ALGORITHM = "HS256"
 
 def token_response(token: str):
+    print("TOEKNNNN -> ", token)
     return {
         "access_token": token
     }
@@ -26,6 +27,7 @@ def signJWT(user_id: str) -> Dict[str, str]:
 def decodeJWT(token: str) -> dict:
     try:
         decoded_token = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-        return decoded_token if decoded_token["expires"] >= time.time() else None
+        print("TOEKNNNNN ------ ", decoded_token)
+        return decoded_token
     except:
         return {}
