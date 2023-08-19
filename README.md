@@ -51,3 +51,9 @@ The following routes are available in the API:
 - POST /paletters/{paletter_id}/favorite - Add favorite. (Requires the access token to varify)
 
 Please refer to the source code and documentation for more details on the API routes and request/response formats.
+
+Can access the project on live:
+
+```
+https://mahinuralam.github.io/Color_Paletters/
+```
