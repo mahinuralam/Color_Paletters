@@ -29,6 +29,12 @@ cd Color_Paletters
 pip install -r requirement.txt
 ```
 
+4. Run the project using bellow command:
+
+```
+uvicorn main:app --reload
+```
+
 Color_Paletters
 
 - By default, the server will start on port 8000. You can access the APIs at http://localhost:8000/docs with Swagger.
